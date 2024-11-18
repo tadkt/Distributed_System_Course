@@ -16,7 +16,7 @@ Collaborating on GitHub with a group where the group captain manages merge reque
 ### 3. **Clone the Forked Repository**
 - Each member clones their forked repository to their local machine:
   ```bash
-  git clone https://github.com/<your-username>/<forked-repo>.git
+  git clone https://github.com/tadkt/Distributed_System_Course.git
   ```
 
 ---
@@ -24,7 +24,7 @@ Collaborating on GitHub with a group where the group captain manages merge reque
 ### 4. **Set Up Remote Connections**
 - To keep their fork in sync with the central repository, each member adds the central repository as an additional remote:
   ```bash
-  git remote add upstream https://github.com/<captain-username>/<central-repo>.git
+  git remote add upstream https://github.com/tadkt/Distributed_System_Course.git
   ```
 
 - Confirm the remotes with:
