@@ -1,12 +1,18 @@
 import socket
+def client():
+    client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)#ivp4,for streaming
+    client.connect((socket.gethostname(),1234)) 
+    file = input("Filename: ")
+    client.sendall(file.encode())
+    with open(f"downloaded_{file}","wb") as f:
+        while True: 
+            data = client.recv(1024)
+            if not data:
+                break
+            f.write(data)
+    print("Original file: ",file) 
+    print("File on my pc: ",f"downloaded_{file}")
 
-s = socket.socket(socket.AF_INET,socket.SOCK_STREAM) #ivp4,for streaming
-s.connect((socket.gethostname(),1234)) # We are not binding anymore because this is client now
+if __name__ == "__main__":
+    client()
 
-full_msg = ''
-while True: # We need to consistently receive the data
-    msg = s.recv(8) # Buffer memory, decice how big a chunk of data maximum we want at a time
-    if len(msg) <= 0:
-        break # End if no more message
-    full_msg += msg.decode("utf-8") # Connect all msg together
-print(full_msg)
