@@ -26,6 +26,7 @@ while True:
     print(f"Connection from {address} has been established!")
 
     #Send file
-    sendfile(socket, "file.txt")
+    sendfile(clientsocket, "file.txt")
 
     clientsocket.close()
+
