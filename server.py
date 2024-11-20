@@ -7,7 +7,8 @@ def sendfile(client_socket, filename):
             while chunk:
                 client_socket.send(chunk)
                 chunk = file.read(1024)
-        client_socket.send(b'EOF')  # Send end-of-file marker
+    except Exception as e:
+        print(f"An error occured: {e}")
     except FileNotFoundError:
         error_message = f"Error: File '{filename}' not found."
         print(error_message)  
@@ -26,7 +27,7 @@ def main():
         print(f"Connection from {address} has been established!")
 
         # Send file
-        sendfile(clientsocket, "example.txt")
+        sendfile(clientsocket, "file.txt")
 
         clientsocket.close()
 
