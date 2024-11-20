@@ -12,18 +12,22 @@ def sendfile(client_socket, filename):
         print(error_message)  
         client_socket.send(bytes(error_message, "utf-8"))  
 
-#Server setup
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((socket.gethostname(), 1234))
-s.listen(5)
+def main():
+    # Server setup
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind((socket.gethostname(), 1234))
+    s.listen(5)
 
-print("Server is listening...")
+    print("Server is listening...")
 
-while True:
-    clientsocket, address = s.accept()
-    print(f"Connection from {address} has been established!")
+    while True:
+        clientsocket, address = s.accept()
+        print(f"Connection from {address} has been established!")
 
-    #Send file
-    sendfile(clientsocket, "example.txt")
+        # Send file
+        sendfile(clientsocket, "example.txt")
 
-    clientsocket.close()
+        clientsocket.close()
+
+if __name__ == "__main__":
+    main()
