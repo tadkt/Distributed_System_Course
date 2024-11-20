@@ -9,7 +9,7 @@ def client():
             data = client.recv(1024)
             if not data:
                 break
-            f.write()
+            f.write(data)
     print("Original file: ",file) 
     print("File on my pc: ",f"downloaded_{file}")
 
