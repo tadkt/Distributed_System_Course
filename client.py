@@ -1,13 +1,15 @@
 import socket
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+#Setup client
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((socket.gethostname(), 1234))
 
-full_msg = ''
+full_msg = b''
 while True:
-    msg = s.recv(8) #send message < 1024 bytes data
-    if len(msg) <=0:
+    chunk = s.recv(1024) #Receive data from chunk
+    if not chunk:
         break
-    full_msg += msg.decode("utf-8")
-    
-print(full_msg)
+    full_msg += chunk
+
+print(full_msg.decode("utf-8"))
+s.close()
