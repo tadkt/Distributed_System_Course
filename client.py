@@ -1,4 +1,5 @@
 import socket
+
 def client():
     client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)#ivp4,for streaming
     client.connect((socket.gethostname(),1234)) 
@@ -15,4 +16,5 @@ def client():
 
 if __name__ == "__main__":
     client()
+
 
