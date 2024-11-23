@@ -22,7 +22,6 @@ def main():
     s.listen(5)
 
     print("Server is listening...")
-
     while True:
         clientsocket, address = s.accept()
         print(f"Connection from {address} has been established!")
@@ -35,6 +34,13 @@ def main():
         sendfile(clientsocket, filename)
 
         clientsocket.close()
-
+def receivefile(client_socket,filename):
+    with open(filename, 'wb') as f:
+        while True:
+            data = client_socket.recv(1024)
+            if data == b'EOF':  # Check for end-of-file marker
+                break
+            f.write(data)
+    print(f"File received successfully: {filename}")
 if __name__ == "__main__":
     main()
