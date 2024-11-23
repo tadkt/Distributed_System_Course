@@ -1,4 +1,12 @@
 import socket
+import logging
+
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, 
+                    format='%(asctime)s - %(levelname)s - %(message)s', 
+                    filename='server.log',  # Log to a file
+                    filemode='a')  # Append to the file
 
 def sendfile(client_socket, filename):
     try:
@@ -15,10 +23,21 @@ def sendfile(client_socket, filename):
     except Exception as e:
         print(f"An error occurred: {e}")
 
+def handle_client(clientsocket):
+    try:
+        # Receive filename from client
+        filename = clientsocket.recv(1024).decode('utf-8')
+        print(f"Client requested file: {filename}")
+
+        # Send file
+        sendfile(clientsocket, filename)
+    finally:
+        clientsocket.close()
+
 def main():
     # Server setup
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind((socket.gethostname(), 1234))
+    s.bind((socket.gethostname(), 1235))
     s.listen(5)
 
     print("Server is listening...")
