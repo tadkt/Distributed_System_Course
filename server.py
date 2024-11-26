@@ -1,40 +1,65 @@
-import socket
+import socket 
+import select
 
-def sendfile(client_socket, filename):
-    try:
-        with open(filename, 'rb') as file:
-            chunk = file.read(1024)  
-            while chunk:
-                client_socket.send(chunk)
-                chunk = file.read(1024)
-        client_socket.send(b'EOF')  # Send end-of-file marker
-    except FileNotFoundError:
-        error_message = f"Error: File '{filename}' not found."
-        print(error_message)  
-        client_socket.send(bytes(error_message, "utf-8"))  
-    except Exception as e:
-        print(f"An error occurred: {e}")
+HEADER_LENGTH = 10
+IP = '127.0.0.1'
+port = 1235
 
-def main():
-    # Server setup
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind((socket.gethostname(), 1234))
-    s.listen(5)
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
 
-    print("Server is listening...")
+server_socket.bind((IP,port))
+print("Server is listening ....")
+server_socket.listen()
 
-    while True:
-        clientsocket, address = s.accept()
-        print(f"Connection from {address} has been established!")
+socket_list = [server_socket]
+clients = {}
 
-        # Receive filename from client
-        filename = clientsocket.recv(1024).decode('utf-8')
-        print(f"Client requested file: {filename}")
+def receive_msg(client_socket):
+    try: 
+        message_header = client_socket.recv(HEADER_LENGTH)
+        
+        if not len(message_header):
+            return False
 
-        # Send file
-        sendfile(clientsocket, filename)
+        message_lenth = int(message_header.decode('utf-8').strip())
+        return {'header':message_header,'data': client_socket.recv(message_lenth)}
+        
+    except:
+        return False
+        
+while True:
+    read_sockets,_, exception_sockets = select.select(socket_list,[], socket_list)
+    
+    for notified_socket in read_sockets:
+        if notified_socket == server_socket:
+            client_socket,client_address = server_socket.accept()
+            
+            user = receive_msg(client_socket)
+            if user is False:
+                continue
+            socket_list.append(client_socket)
+            
+            clients[client_socket] = user
+            print(f'Accepted new connection from {client_address[0]}:{client_address[1]} username: {user['data'].decode('utf-8')}')
 
-        clientsocket.close()
+        else:
+            message = receive_msg(notified_socket)
+            
+            if message is False:
+                print(f'Closed connection from {clients[notified_socket]['data'].decode('utf-8')}')
+                socket_list.remove(notified_socket)
+                del clients[notified_socket]
+                continue
 
-if __name__ == "__main__":
-    main()
+            user = clients[notified_socket]
+            print(f'Received message from {user['data'].decode('utf-8')} : {message['data'].decode('utf-8')}')
+
+            for client_socket in clients:
+                if client_socket != notified_socket:
+                    client_socket.send(user['header'] + user['data'] + message['header'] + message['data'])
+
+    for notified_socket in exception_sockets:
+        socket_list.remove(notified_socket)
+        del clients[notified_socket]
+
